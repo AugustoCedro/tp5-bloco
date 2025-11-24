@@ -1,19 +1,20 @@
 plugins {
     id 'java'
     id 'jacoco'
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -39,6 +40,10 @@ dependencies {
     implementation 'io.github.bonigarcia:webdrivermanager:6.3.2'
 }
 
+application {
+    mainClass = 'org.example.app.App'
+}
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
@@ -59,4 +64,10 @@ jacocoTestReport {
 
 shadowJar {
     archiveClassifier.set("all")
+
+    manifest {
+        attributes(
+                'Main-Class': 'org.example.app.App'
+        )
+    }
 }
