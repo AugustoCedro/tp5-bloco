@@ -21,21 +21,25 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build JAR com dependências
-        run: mvn clean package -DskipTests
+      - name: Set Gradlew permission
+        run: chmod +x gradlew
+
+      - name: Build JAR com dependências (Gradle)
+        run: ./gradlew clean bootJar --no-daemon
 
       - name: Verificar JAR gerado
         run: |
-          echo "Conteúdo do target:"
-          ls -lh target/
+          echo "Conteúdo do build/libs:"
+          ls -lh build/libs/
           echo ""
           echo "Verificando conteúdo do JAR"
-          jar tf target/dast-demo-1.0-SNAPSHOT.jar | head -20
+          jar tf $(ls build/libs/*.jar | head -n 1) | head -20
 
       - name: Start app in background
         run: |
-          echo "Iniciando app em Java"
-          nohup java -jar target/dast-demo-1.0-SNAPSHOT.jar > logs.txt 2>&1 &
+          JAR=$(ls build/libs/*.jar | head -n 1)
+          echo "Iniciando app em Java: $JAR"
+          nohup java -jar "$JAR" > logs.txt 2>&1 &
           echo $! > app.pid
           echo "App PID: $(cat app.pid)"
 
