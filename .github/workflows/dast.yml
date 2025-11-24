@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR com dependências (Gradle)
-        run: ./gradlew clean bootJar --no-daemon
+        run: ./gradlew clean jar --no-daemon
 
       - name: Verificar JAR gerado
         run: |
