@@ -21,21 +21,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: gradle
 
-      - name: Set Gradlew permission
+      - name: Dar permissão ao Gradlew
         run: chmod +x gradlew
 
       - name: Compilar e testar
         run: ./gradlew clean test
 
-      - name: Construir JAR
-        run: ./gradlew clean jar
+      - name: Construir fat JAR (shadowJar)
+        run: ./gradlew clean shadowJar
 
       - name: Upload do JAR como artefato
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/libs/*.jar
+          path: build/libs/*-all.jar
 
 
   # ==========================
@@ -46,6 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     environment: development
+
     steps:
       - name: Baixar artefato
         uses: actions/download-artifact@v4
@@ -66,6 +68,7 @@ jobs:
     environment:
       name: production
       url: https://meuapp-producao.com
+
     steps:
       - name: Baixar artefato
         uses: actions/download-artifact@v4
