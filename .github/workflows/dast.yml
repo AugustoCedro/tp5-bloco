@@ -24,8 +24,8 @@ jobs:
       - name: Set Gradlew permission
         run: chmod +x gradlew
 
-      - name: Build JAR com dependências (Gradle)
-        run: ./gradlew clean jar --no-daemon
+      - name: Build FAT JAR (ShadowJar)
+        run: ./gradlew clean shadowJar --no-daemon
 
       - name: Verificar JAR gerado
         run: |
@@ -33,11 +33,11 @@ jobs:
           ls -lh build/libs/
           echo ""
           echo "Verificando conteúdo do JAR"
-          jar tf $(ls build/libs/*.jar | head -n 1) | head -20
+          jar tf $(ls build/libs/*-all.jar | head -n 1) | head -20
 
       - name: Start app in background
         run: |
-          JAR=$(ls build/libs/*.jar | head -n 1)
+          JAR=$(ls build/libs/*-all.jar | head -n 1)
           echo "Iniciando app em Java: $JAR"
           nohup java -jar "$JAR" > logs.txt 2>&1 &
           echo $! > app.pid
@@ -45,10 +45,10 @@ jobs:
 
       - name: Wait for app to be ready
         run: |
-          echo "Aguardado aplicação em http://localhost:7000 ..."
+          echo "Esperando aplicação iniciar na porta 7000..."
           for i in {1..60}; do
             if curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
-              echo "App está pronta!"
+              echo "Aplicação está pronta!"
               break
             fi
             echo "Tentativa $i/60..."
@@ -56,7 +56,7 @@ jobs:
           done
           
           if ! curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
-            echo "App não iniciou a tempo. Logs:"
+            echo "A aplicação não subiu. Logs:"
             cat logs.txt || true
             exit 1
           fi
@@ -86,7 +86,7 @@ jobs:
       - name: Show app logs
         if: always()
         run: |
-          echo "=== Logs da aplicacao ==="
+          echo "=== Logs da aplicação ==="
           cat logs.txt || echo "Sem logs"
 
       - name: List zap-reports
@@ -113,6 +113,5 @@ jobs:
           path: |
             zap-reports/
             logs.txt
-
           retention-days: 30
           if-no-files-found: 'warn'
