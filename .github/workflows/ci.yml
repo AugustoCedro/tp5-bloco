@@ -19,6 +19,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Dar permissão ao Gradlew
+        run: chmod +x gradlew
+
       - name: Install Chrome
         run: |
           sudo apt update
