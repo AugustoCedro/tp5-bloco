@@ -1,4 +1,4 @@
-tp4-bloco — Projeto Java com Javalin, Testes e Cobertura
+tp5-bloco — Projeto Java com Javalin, Workflows, Testes e Cobertura
 ---
 ## Descrição
 Este projeto contém uma aplicação Java utilizando Javalin, testes com JUnit e jqwik, automação com Selenium, e geração de cobertura de testes com Jacoco.
@@ -23,15 +23,15 @@ O repositório também inclui um workflow do GitHub Actions responsável por exe
 ### 🔧 Pré-requisitos
 
 - **Java 21** ou superior instalado
-- **Maven** instalado
+- **Gradle** instalado
 - **Git** instalado
 
 ### Passos para execução
 
 1. **Clonar o repositório:**
    ```bash
-   git clone https://github.com/AugustoCedro/tp4-bloco.git
-   cd tp4-bloco    
+   git clone https://github.com/AugustoCedro/tp5-bloco.git
+   cd tp5-bloco    
 
 2. **Compilar o projeto:**
     ```bash
@@ -41,10 +41,8 @@ O repositório também inclui um workflow do GitHub Actions responsável por exe
     ./gradlew run
 4. **Acessar a API:**
     ```bash
-    http://localhost:7070
+    http://localhost:7000
 5. **Rodar os Testes:**
     ```bash
     ./gradlew test
-6. **Gerar o relatório de cobertura(Jacoco):**
-  ```bash
-    ./gradlew test
+
