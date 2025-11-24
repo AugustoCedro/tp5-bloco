@@ -23,7 +23,7 @@ public class UserController {
             if (user.getRole() == Role.ADMIN) {
                 ctx.result("Bem vindo admin " + user.getEmail() + "! Chave:" + SECRET_KEY);
             } else {
-                ctx.result("Olá " + user.getEmail() + "!");
+                ctx.result("Bem vindo " + user.getEmail() + "!");
             }
         });
 
