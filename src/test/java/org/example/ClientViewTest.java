@@ -11,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 public class ClientViewTest {
 
@@ -20,13 +21,19 @@ public class ClientViewTest {
     @BeforeAll
     static void setup() {
         WebDriverManager.chromedriver().setup();
+
         app = Javalin.create();
         new ClientController(app);
         app.start(7000);
 
-        driver = new ChromeDriver();
-    }
 
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080");
+        driver = new ChromeDriver(options);
+    }
     @AfterAll
     static void teardown() {
         driver.quit();
