@@ -1,0 +1,59 @@
+name: Pipeline Java com ambientes
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  #Job 1: Build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout de Código
+      uses: actions/checkout@v4
+
+    - name: Configurar Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Compilar e testar
+      run: ./gradlew clean test
+
+    - name: Gerar relatório
+      uses: actions/upload-artifact@v4
+      with:
+        name: app
+        path: target/*.jar
+  #Job 2: Deploy de desenvolvimento
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref=='refs/heads/master'
+    environment: development
+    steps:
+      - name: Baixar artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+      - name: Deploy em ambiente de desenvolvimento
+        run: echo "Aplicação implantada em DEV"
+  #Job 3: Deploy em produção
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref=='refs/heads/master'
+    environment:
+      name: production
+      url: https://meuapp-producao.com
+    steps:
+      - name: Baixar artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+      - name: Aprovação manual
+        run: echo "Aguardando aprovação para produção"
+
+      - name: Deploy em ambiente de produção
+        run: echo "Aplicação implantada em produção"
+
