@@ -23,6 +23,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'net.jqwik:jqwik:1.9.3'
 
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     // --- Javalin ---
     implementation 'io.javalin:javalin:6.7.0'
     runtimeOnly 'io.javalin:javalin-rendering:6.7.0'
