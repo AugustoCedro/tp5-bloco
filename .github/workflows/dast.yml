@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Aguardado aplicação em http://localhost:7000 ..."
           for i in {1..60}; do
-            if curl -sSf "http://localhost:7000/hello?user=test" >/dev/null 2>&1; then
+            if curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
               echo "App está pronta!"
               break
             fi
@@ -55,7 +55,7 @@ jobs:
             sleep 2
           done
           
-          if ! curl -sSf "http://localhost:7000/hello?user=test" >/dev/null 2>&1; then
+          if ! curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
             echo "App não iniciou a tempo. Logs:"
             cat logs.txt || true
             exit 1
