@@ -47,3 +47,12 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+
+      - name: Resumo CodeQL
+        if: always()
+        run: |
+          echo "## Resumo CodeQL Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Linguagem analisada: ${{ matrix.language }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Queries executadas: security-extended, security-and-quality" >> $GITHUB_STEP_SUMMARY
+          echo "- Logs e resultados podem ser visualizados na aba Security ou no output do workflow." >> $GITHUB_STEP_SUMMARY

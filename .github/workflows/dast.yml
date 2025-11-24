@@ -61,11 +61,6 @@ jobs:
             exit 1
           fi
 
-          echo "=== Testando endpoints ==="
-          curl -i "http://localhost:7000/hello?user=admin"
-          curl -i "http://localhost:7000/getUser?id=1"
-          curl -i "http://localhost:7000/run?cmd=whoami"
-
       - name: Create report dir
         run: mkdir -p zap-reports
 
@@ -115,3 +110,14 @@ jobs:
             logs.txt
           retention-days: 30
           if-no-files-found: 'warn'
+
+      - name: DAST Summary
+        if: always()
+        run: |
+          echo "## Resumo DAST Scan" >> $GITHUB_STEP_SUMMARY
+          echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefatos gerados:" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.html" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.json" >> $GITHUB_STEP_SUMMARY
+          echo "  - zap-reports/zap_report.md" >> $GITHUB_STEP_SUMMARY
+          echo "- Logs da aplicação: logs.txt" >> $GITHUB_STEP_SUMMARY

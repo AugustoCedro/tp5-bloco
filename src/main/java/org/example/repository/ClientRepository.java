@@ -45,7 +45,7 @@ public class ClientRepository {
 
     public void updateClient(Client newClient) {
         for(Client client : repository){
-            if(client.getId() == newClient.getId()){
+            if(Objects.equals(client.getId(), newClient.getId())){
                 client.setEmail(newClient.getEmail());
                 client.setName(newClient.getName());
             }

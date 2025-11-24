@@ -40,6 +40,13 @@ jobs:
           name: app
           path: build/libs/*-all.jar
 
+      - name: Build Summary
+        run: |
+          echo "## Resumo do Build" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
+          echo "- Relatório de testes: build/reports/tests/index.html" >> $GITHUB_STEP_SUMMARY
+
   # ==========================
   # JOB 2 — DEPLOY DEV
   # ==========================
@@ -57,6 +64,13 @@ jobs:
 
       - name: Deploy em ambiente de desenvolvimento
         run: echo "Aplicação implantada em DEV"
+
+      - name: Deploy DEV Summary
+        run: |
+          echo "## Resumo Deploy DEV" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Ambiente: development" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
 
   # ==========================
   # JOB 3 — DEPLOY PROD
@@ -80,3 +94,11 @@ jobs:
 
       - name: Deploy em ambiente de produção
         run: echo "Aplicação implantada em produção"
+
+      - name: Deploy PROD Summary
+        run: |
+          echo "## Resumo Deploy PROD" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Ambiente: production" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: https://meuapp-producao.com" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
