@@ -29,20 +29,4 @@ public class UserRepository {
         }
         return null;
     }
-
-    public void addUser(User user) {
-        repository.add(user);
-    }
-
-    public void updateUser(User newUser) {
-        for(User user : repository){
-            if(user.getId() == newUser.getId()){
-                user.setEmail(newUser.getEmail());
-            }
-        }
-    }
-
-    public void deleteUser(int id) {
-        repository.remove(id - 1);
-    }
 }

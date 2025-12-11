@@ -46,7 +46,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-  # ============================================================
+    # ============================================================
   # 2) DAST - OWASP ZAP
   # ============================================================
   dast:
@@ -60,12 +60,18 @@ jobs:
       - name: Build and run app
         run: |
           ./gradlew bootRun &
-          sleep 20 # espera app subir
+          sleep 20 
 
       - name: Install OWASP ZAP
         run: |
+          
           sudo apt update
-          sudo apt install -y zaproxy zap-cli
+          sudo apt install -y snapd
+          sudo snap install zaproxy --classic
+
+        
+          python3 -m pip install --upgrade pip
+          pip install zap-cli
 
       - name: Run DAST scan
         run: |
@@ -80,3 +86,4 @@ jobs:
         with:
           name: dast-report
           path: zap_report.html
+
