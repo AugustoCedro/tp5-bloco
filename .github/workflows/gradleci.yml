@@ -68,38 +68,38 @@ jobs:
           path: build/reports/jacoco/test/html/
 
   # ============================================================
-  # 2) TESTES PÓS-DEPLOY (SELENIUM)
-  # ============================================================
-  post-deploy-selenium-tests:
-    runs-on: ubuntu-latest
-    needs: build-test
+# 2) TESTES PÓS-DEPLOY (SELENIUM)
+# ============================================================
+post-deploy-selenium-tests:
+  runs-on: ubuntu-latest
+  needs: build-test
 
-    steps:
-      - name: Baixando Código
-        uses: actions/checkout@v4
+  steps:
+    - name: Baixando Código
+      uses: actions/checkout@v4
 
-      - name: Configurando Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
+    - name: Configurando Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "21"
 
-      - name: Dando permissão ao Gradle
-        run: chmod +x ./gradlew
+    - name: Dando permissão ao Gradle
+      run: chmod +x ./gradlew
 
-      - name: Instalando Google Chrome
-        run: |
-          sudo apt update
-          sudo apt install -y wget
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+    - name: Instalando Google Chrome
+      run: |
+        sudo apt update
+        sudo apt install -y wget
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Rodando testes Selenium pós-deploy
-        run: ./gradlew seleniumTest -Dapp.url=${{ secrets.APP_URL }}
+    - name: Rodando testes Selenium pós-deploy
+      run: ./gradlew test -Dapp.url=${{ secrets.APP_URL }}
 
-      - name: Upload logs do Selenium
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: selenium-logs
-          path: build/reports/selenium/
+    - name: Upload logs do Selenium
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: selenium-logs
+        path: build/reports/tests/test/
