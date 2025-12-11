@@ -70,7 +70,7 @@ jobs:
   # ============================================================
   # 2) TESTES PÓS-DEPLOY (SELENIUM)
   # ============================================================
-  selenium-tests:
+  post-deploy-selenium-tests:
     runs-on: ubuntu-latest
     needs: build-test
 
@@ -83,6 +83,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+
+      - name: Dando permissão ao Gradle
+        run: chmod +x ./gradlew
 
       - name: Instalando Google Chrome
         run: |
