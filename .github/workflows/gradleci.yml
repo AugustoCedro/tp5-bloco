@@ -1,0 +1,102 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  release:
+    types: [created, published]
+  workflow_dispatch:
+
+jobs:
+  # ============================================================
+  # 1) BUILD + TESTES UNITÁRIOS
+  # ============================================================
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixando Código do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurando Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Cache do Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Dando permissão ao Gradle
+        run: chmod +x ./gradlew
+
+      - name: Build do projeto com Gradle
+        run: ./gradlew build --stacktrace
+
+      - name: Instalando Chrome
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+
+      - name: Rodando tests
+        run: ./gradlew test
+
+      - name: Gerar relatório de cobertura (JaCoCo)
+        run: ./gradlew jacocoTestReport
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/
+
+      - name: Upload relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/reports/jacoco/test/html/
+
+  # ============================================================
+  # 2) TESTES PÓS-DEPLOY (SELENIUM)
+  # ============================================================
+  selenium-tests:
+    runs-on: ubuntu-latest
+    needs: build-test
+
+    steps:
+      - name: Baixando Código
+        uses: actions/checkout@v4
+
+      - name: Configurando Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Instalando Google Chrome
+        run: |
+          sudo apt update
+          sudo apt install -y wget
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+
+      - name: Rodando testes Selenium pós-deploy
+        run: ./gradlew seleniumTest -Dapp.url=${{ secrets.APP_URL }}
+
+      - name: Upload logs do Selenium
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-logs
+          path: build/reports/selenium/

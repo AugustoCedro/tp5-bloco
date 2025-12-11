@@ -60,33 +60,50 @@ public class ClientView {
         Object id = model.get("id");
         String action = id != null ? "/clients/edit/" + id : "/clients";
         String title = id != null ? "Editar Cliente" : "Novo Cliente";
+
         String name = (String) model.getOrDefault("name", "");
         String email = (String) model.getOrDefault("email", "");
 
+        String nameError = (String) model.getOrDefault("nameError", "");
+        String emailError = (String) model.getOrDefault("emailError", "");
+        String generalError = (String) model.getOrDefault("generalError", "");
+
         return String.format("""
-                <!DOCTYPE html>
-                <html lang="pt">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>%s</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                </head>
-                <body class="container mt-5">
-                    <h1>%s</h1>
-                    <form action="%s" method="post">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="name" name="name" value="%s" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="%s" required>
-                        </div>
-                        <button type="submit" class="btn btn-success">Salvar</button>
-                        <a href="/items" class="btn btn-secondary">Cancelar</a>
-                    </form>
-                </body>
-                </html>
-                """, title, title, action, name, email);
+            <!DOCTYPE html>
+            <html lang="pt">
+            <head>
+                <meta charset="UTF-8">
+                <title>%s</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            </head>
+            <body class="container mt-5">
+
+                <h1>%s</h1>
+
+                <!-- Erro geral -->
+                %s
+
+                <form action="%s" method="post">
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome</label>
+                        <input type="text" class="form-control %s" id="name" name="name" value="%s">
+                        <small class="text-danger">%s</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control %s" id="email" name="email" value="%s">
+                        <small class="text-danger">%s</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <a href="/clients" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </body>
+            </html>
+            """, title, title, generalError.isEmpty() ? "" : "<div class='alert alert-danger'>" + generalError + "</div>", action, nameError.isEmpty() ? "" : "is-invalid", name, nameError, emailError.isEmpty() ? "" : "is-invalid", email, emailError
+        );
     }
+
 }

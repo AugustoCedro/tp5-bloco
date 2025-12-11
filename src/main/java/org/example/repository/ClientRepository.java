@@ -36,7 +36,16 @@ public class ClientRepository {
                 return client;
             }
         }
-       return null;
+        return null;
+    }
+
+    public Client findClientByEmail(String email) {
+        for(Client client : repository){
+            if(Objects.equals(email, client.getEmail())){
+                return client;
+            }
+        }
+        return null;
     }
 
     public void addClient(Client client) {
