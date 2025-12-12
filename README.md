@@ -45,7 +45,8 @@ O repositório também inclui um workflow do GitHub Actions responsável por exe
     ./gradlew run
 4. **Acessar a API:**
     ```bash
-    http://localhost:7000
+    http://localhost:7000/clients
+    http://localhost:7000/users
 5. **Rodar os Testes:**
     ```bash
     ./gradlew test
