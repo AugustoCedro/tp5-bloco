@@ -35,11 +35,14 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Initialize CodeQL
+      - name: Log CodeQL initialization
         run: echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Inicializando CodeQL"
+
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+
 
       - name: Build project for CodeQL
         run: |
