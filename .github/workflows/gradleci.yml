@@ -40,18 +40,39 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build do projeto com Gradle
-        run: ./gradlew build --stacktrace
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando build do projeto"
+          ./gradlew build --stacktrace > build.log 2>&1 || echo "::error::Falha no build. Verifique build.log"
+
+      - name: Upload logs do Gradle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-logs
+          path: build.log
 
       - name: Instalando Chrome
         run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Instalando Google Chrome"
           sudo apt update
           sudo apt install -y google-chrome-stable
 
       - name: Rodando tests
-        run: ./gradlew test
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando testes unitários"
+          ./gradlew test > test.log 2>&1 || echo "::error::Falha nos testes unitários"
+
+      - name: Upload logs de testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-logs
+          path: test.log
 
       - name: Gerar relatório de cobertura (JaCoCo)
-        run: ./gradlew jacocoTestReport
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Gerando relatório de cobertura"
+          ./gradlew jacocoTestReport
 
       - name: Upload test reports
         if: always()
@@ -89,17 +110,20 @@ jobs:
 
       - name: Instalando Google Chrome
         run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Instalando Google Chrome para Selenium"
           sudo apt update
           sudo apt install -y wget
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
       - name: Rodando testes Selenium pós-deploy
-        run: ./gradlew test -Dapp.url=${{ secrets.APP_URL }}
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando testes Selenium pós-deploy"
+          ./gradlew test -Dapp.url=${{ secrets.APP_URL }} > selenium.log 2>&1 || echo "::error::Falha nos testes Selenium"
 
       - name: Upload logs do Selenium
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: selenium-logs
-          path: build/reports/tests/test/
+          path: selenium.log
