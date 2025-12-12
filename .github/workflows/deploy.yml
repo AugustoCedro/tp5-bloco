@@ -1,7 +1,7 @@
 name: Pipeline Java com ambientes
 on:
   push:
-    branches: [ "main", "master", "test" ] # adiciona a branch test
+    branches: [ "main", "master", "test" ]
   workflow_dispatch:
 
 jobs:
