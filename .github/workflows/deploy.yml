@@ -1,7 +1,8 @@
 name: Pipeline Java com ambientes
+
 on:
   push:
-    branches: [ "main", "master", "test" ]
+    branches: [ "main", "master", "test", "dev" ]
   workflow_dispatch:
 
 jobs:
@@ -21,6 +22,9 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Log Cache Gradle
+        run: echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Configurando cache do Gradle"
+
       - name: Cache do Gradle
         uses: actions/cache@v3
         with:
@@ -32,13 +36,25 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Dando permissão ao Gradle
-        run: chmod +x ./gradlew
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Dando permissão ao Gradle"
+          chmod +x ./gradlew
 
       - name: Build do projeto com Gradle
-        run: ./gradlew build --stacktrace
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando build do projeto"
+          ./gradlew build --stacktrace > build.log 2>&1 || echo "::error::Build falhou. Verifique build.log"
+
+      - name: Upload logs do build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: build.log
 
       - name: Instalando Chrome
         run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Instalando Google Chrome"
           sudo apt update
           sudo apt install -y google-chrome-stable
 
@@ -62,8 +78,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app
+
       - name: Deploy em ambiente de desenvolvimento
-        run: echo "Aplicação implantada em DEV"
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando deploy em DEV"
+          echo "Aplicação implantada em DEV"
 
   # ============================================================
   # 3) DEPLOY TEST
@@ -79,8 +98,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app
+
       - name: Deploy em ambiente de teste
-        run: echo "Aplicação implantada em TEST / STAGING"
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando deploy em TEST / STAGING"
+          echo "Aplicação implantada em TEST / STAGING"
 
   # ============================================================
   # 4) DEPLOY PROD
@@ -98,7 +120,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app
+
       - name: Aprovação manual
-        run: echo "Aguardando aprovação para produção"
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Aguardando aprovação para produção"
+          echo "Aprovado manualmente"
+
       - name: Deploy em ambiente de produção
-        run: echo "Aplicação implantada em produção"
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando deploy em PRODUÇÃO"
+          echo "Aplicação implantada em produção"
