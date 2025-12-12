@@ -36,23 +36,35 @@ jobs:
           java-version: '21'
 
       - name: Initialize CodeQL
+        run: echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Inicializando CodeQL"
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
 
       - name: Build project for CodeQL
-        run: ./gradlew build -x test
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Build para CodeQL"
+          ./gradlew build -x test > codeql-build.log 2>&1 || echo "::error::Falha no build para CodeQL"
+
+      - name: Upload logs CodeQL build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-build-logs
+          path: codeql-build.log
 
       - name: Perform CodeQL Analysis
+        run: echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando análise CodeQL"
         uses: github/codeql-action/analyze@v3
 
-    # ============================================================
+  # ============================================================
   # 2) DAST - OWASP ZAP
   # ============================================================
   dast:
     name: DAST Security Scan
     runs-on: ubuntu-latest
     needs: sast
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,42 +79,58 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build FAT JAR (ShadowJar)
-        run: ./gradlew clean shadowJar --no-daemon
+        run: |
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Build FAT JAR"
+          ./gradlew clean shadowJar --no-daemon > dast-build.log 2>&1 || echo "::error::Falha ao gerar FAT JAR"
+
+      - name: Upload logs DAST build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast-build-logs
+          path: dast-build.log
 
       - name: Verificar JAR gerado
         run: |
-          echo "Conteúdo do build/libs:"
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Conteúdo do build/libs"
           ls -lh build/libs/
-          echo ""
-          echo "Verificando conteúdo do JAR"
+          echo "::notice::Verificando conteúdo do JAR"
           jar tf $(ls build/libs/*-all.jar | head -n 1) | head -20
 
       - name: Start app in background
         run: |
           JAR=$(ls build/libs/*-all.jar | head -n 1)
-          echo "Iniciando app em Java: $JAR"
-          nohup java -jar "$JAR" > logs.txt 2>&1 &
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando app em Java: $JAR"
+          nohup java -jar "$JAR" > app.log 2>&1 &
           echo $! > app.pid
-          echo "App PID: $(cat app.pid)"
+          echo "::notice::App PID: $(cat app.pid)"
 
       - name: Wait for app to be ready
         run: |
-          echo "Esperando aplicação iniciar na porta 7000..."
+          echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Esperando aplicação iniciar na porta 7000..."
           for i in {1..60}; do
             if curl -sf 'http://localhost:7000/hello?user=bob@user.com' >/dev/null 2>&1; then
-              echo "Aplicação está pronta!"
+              echo "::notice::Aplicação está pronta!"
               break
             fi
-            echo "Tentativa $i/60..."
+            echo "::notice::Tentativa $i/60..."
             sleep 2
           done
-          
+
           if ! curl -sf 'http://localhost:7000/hello?user=bob@user.com' >/dev/null 2>&1; then
-            echo "A aplicação não subiu. Logs:"
-            cat logs.txt || true
+            echo "::error::A aplicação não subiu. Exibindo logs:"
+            cat app.log || true
             exit 1
           fi
 
+      - name: Upload app logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast-app-logs
+          path: app.log
+
       - name: Create report dir
         run: mkdir -p zap-reports
+
 
