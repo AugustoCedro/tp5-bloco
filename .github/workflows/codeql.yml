@@ -57,33 +57,52 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build and run app
-        run: |
-          ./gradlew bootRun &
-          sleep 20 
-
-      - name: Install OWASP ZAP
-        run: |
-          
-          sudo apt update
-          sudo apt install -y snapd
-          sudo snap install zaproxy --classic
-
-        
-          python3 -m pip install --upgrade pip
-          pip install zap-cli
-
-      - name: Run DAST scan
-        run: |
-          zap.sh -daemon -port 8090 -host 127.0.0.1 -newsession session1
-          zap-cli -p 8090 status -t 120
-          zap-cli -p 8090 spider http://localhost:8080
-          zap-cli -p 8090 active-scan http://localhost:8080
-          zap-cli -p 8090 report -o zap_report.html -f html
-
-      - name: Upload DAST report
-        uses: actions/upload-artifact@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          name: dast-report
-          path: zap_report.html
+          distribution: temurin
+          java-version: 21
+
+      - name: Set gradlew permission
+        run: chmod +x gradlew
+
+      - name: Build FAT JAR (ShadowJar)
+        run: ./gradlew clean shadowJar --no-daemon
+
+      - name: Verificar JAR gerado
+        run: |
+          echo "Conteúdo do build/libs:"
+          ls -lh build/libs/
+          echo ""
+          echo "Verificando conteúdo do JAR"
+          jar tf $(ls build/libs/*-all.jar | head -n 1) | head -20
+
+      - name: Start app in background
+        run: |
+          JAR=$(ls build/libs/*-all.jar | head -n 1)
+          echo "Iniciando app em Java: $JAR"
+          nohup java -jar "$JAR" > logs.txt 2>&1 &
+          echo $! > app.pid
+          echo "App PID: $(cat app.pid)"
+
+      - name: Wait for app to be ready
+        run: |
+          echo "Esperando aplicação iniciar na porta 7000..."
+          for i in {1..60}; do
+            if curl -sf 'http://localhost:7000/hello?user=bob@user.com' >/dev/null 2>&1; then
+              echo "Aplicação está pronta!"
+              break
+            fi
+            echo "Tentativa $i/60..."
+            sleep 2
+          done
+          
+          if ! curl -sf 'http://localhost:7000/hello?user=bob@user.com' >/dev/null 2>&1; then
+            echo "A aplicação não subiu. Logs:"
+            cat logs.txt || true
+            exit 1
+          fi
+
+      - name: Create report dir
+        run: mkdir -p zap-reports
 
