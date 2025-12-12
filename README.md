@@ -1,9 +1,8 @@
 tp5-bloco — Projeto Java com Javalin, Workflows, Testes e Cobertura
 ---
-[![CI/CD Pós-deploy.yml](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/ci.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/ci.yml)
-[![CodeQL Analysis](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml)
-[![DAST Scan](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/dast.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/dast.yml)
 [![Pipeline Java com ambientes](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/deploy.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/deploy.yml)
+[![Security Pipeline (SAST + DAST)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml)
+[![CI Pipeline](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/gradleci.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/gradleci.yml)
 ---
 ## Descrição
 Este projeto contém uma aplicação Java utilizando Javalin, testes com JUnit e jqwik, automação com Selenium, e geração de cobertura de testes com Jacoco.
