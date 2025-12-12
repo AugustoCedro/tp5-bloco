@@ -43,7 +43,6 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-
       - name: Build project for CodeQL
         run: |
           echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Build para CodeQL"
@@ -56,8 +55,10 @@ jobs:
           name: codeql-build-logs
           path: codeql-build.log
 
-      - name: Perform CodeQL Analysis
+      - name: Log CodeQL analysis start
         run: echo "::notice::[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando análise CodeQL"
+
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
   # ============================================================
@@ -135,5 +136,3 @@ jobs:
 
       - name: Create report dir
         run: mkdir -p zap-reports
-
-
